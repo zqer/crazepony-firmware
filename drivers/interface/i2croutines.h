@@ -132,7 +132,7 @@ void I2C_DMAConfig(I2C_TypeDef* I2Cx, uint8_t* pBuffer, uint32_t BufferSize, uin
 
 void i2cInterruptHandlerI2c1(void);
 void i2cErrorInterruptHandlerI2c1(void);
-void i2cDmaInterruptHandlerI2c1(void);
+//void i2cDmaInterruptHandlerI2c1(void);
 
 #endif
 

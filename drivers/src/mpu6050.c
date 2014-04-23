@@ -54,7 +54,7 @@ void mpu6050Init(I2C_TypeDef *i2cPort)
     return;
 
   I2Cx = i2cPort;
-  devAddr = MPU6050_ADDRESS_AD0_HIGH;
+  devAddr = MPU6050_ADDRESS_AD0_LOW;
 
   isInit = TRUE;
 }
@@ -1131,7 +1131,7 @@ void mpu6050SetMasterClockSpeed(uint8_t speed)
  * operation, and if it is cleared, then it's a write operation. The remaining
  * bits (6-0) are the 7-bit device address of the slave device.
  *
- * In read mode, the result of the read is placed in the lowest available 
+ * In read mode, the result of the read is placed in the lowest available
  * EXT_SENS_DATA register. For further information regarding the allocation of
  * read results, please refer to the EXT_SENS_DATA register description
  * (Registers 73 - 96).

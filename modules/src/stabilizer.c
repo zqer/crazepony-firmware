@@ -145,7 +145,7 @@ void stabilizerInit(void)
   if(isInit)
     return;
 
-  motorsInit();
+  /* motorsInit(); */
   imu6Init();
   sensfusion6Init();
   controllerInit();
@@ -279,9 +279,13 @@ static void stabilizerAltHoldUpdate(void)
 
   // Get barometer height estimates
   //TODO do the smoothing within getData
+
+  /* No ms5611 hear in board3 updated by jannson*/
+#if 0
   ms5611GetData(&pressure, &temperature, &aslRaw);
   asl = asl * aslAlpha + aslRaw * (1 - aslAlpha);
   aslLong = aslLong * aslAlphaLong + aslRaw * (1 - aslAlphaLong);
+#endif
 
   // Estimate vertical speed based on successive barometer readings. This is ugly :)
   vSpeedASL = deadband(asl - aslLong, vSpeedASLDeadband);
@@ -292,7 +296,8 @@ static void stabilizerAltHoldUpdate(void)
   vSpeedAcc = vSpeed;
 
   // Reset Integral gain of PID controller if being charged
-  if (!pmIsDischarging())
+  /* TODO for pm */
+  /* if (!pmIsDischarging()) */
   {
     altHoldPID.integ = 0.0;
   }

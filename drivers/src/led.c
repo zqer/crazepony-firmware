@@ -34,6 +34,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+//#define MOTORS_TEST
+
 static bool isInit=false;
 
 static GPIO_TypeDef* led_port[] = {
@@ -91,9 +93,9 @@ void ledSet(led_t led, bool value) {
     value = !value;
   
   if(value)
-    GPIO_SetBits(led_port[led], led_pin[led]);
-  else
     GPIO_ResetBits(led_port[led], led_pin[led]); 
+  else
+    GPIO_SetBits(led_port[led], led_pin[led]);
 
 #ifdef MOTORS_TEST    
   if(led == LED_RED) {

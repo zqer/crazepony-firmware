@@ -1,6 +1,6 @@
 /*
- *    ||          ____  _ __                           
- * +------+      / __ )(_) /_______________ _____  ___ 
+ *    ||          ____  _ __
+ * +------+      / __ )(_) /_______________ _____  ___
  * | 0xBC |     / __  / / __/ ___/ ___/ __ `/_  / / _ \
  * +------+    / /_/ / / /_/ /__/ /  / /_/ / / /_/  __/
  *  ||  ||    /_____/_/\__/\___/_/   \__,_/ /___/\___/
@@ -47,7 +47,8 @@ void commInit(void)
 #ifdef USE_ESKYLINK
   eskylinkInit();
 #else
-  radiolinkInit();
+  /* TODO for NRF init */
+  /* radiolinkInit(); */
 #endif
 
   crtpInit();
@@ -57,41 +58,42 @@ void commInit(void)
 #elif defined(USE_ESKYLINK)
   crtpSetLink(eskylinkGetLink());
 #else
-  crtpSetLink(radiolinkGetLink());
+  /* crtpSetLink(radiolinkGetLink()); */
 #endif
 
   crtpserviceInit();
   logInit();
   consoleInit();
   paramInit();
-  
+
   //setup CRTP communication channel
   //TODO: check for USB first and prefer USB over radio
   //if (usbTest())
   //  crtpSetLink(usbGetLink);
   //else if(radioTest())
   //  crtpSetLink(radioGetLink());
-  
+
   isInit = true;
 }
 
 bool commTest(void)
 {
   bool pass=isInit;
-  
+
   #ifdef USE_UART_CRTP
   pass &= uartTest();
   #elif defined(USE_ESKYLINK)
   pass &= eskylinkTest();
   #else
-  pass &= radiolinkTest();
+  /* TODO for NRF init */
+  /* pass &= radiolinkTest();*/
   #endif
-  
+
   pass &= crtpTest();
   pass &= crtpserviceTest();
   pass &= consoleTest();
   pass &= paramTest();
-  
+
   return pass;
 }
 

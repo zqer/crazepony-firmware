@@ -1,6 +1,6 @@
 /*
- *    ||          ____  _ __                           
- * +------+      / __ )(_) /_______________ _____  ___ 
+ *    ||          ____  _ __
+ * +------+      / __ )(_) /_______________ _____  ___
  * | 0xBC |     / __  / / __/ ___/ ___/ __ `/_  / / _ \
  * +------+    / /_/ / / /_/ /__/ /  / /_/ / / /_/  __/
  *  ||  ||    /_____/_/\__/\___/_/   \__,_/ /___/\___/
@@ -81,22 +81,22 @@ void systemInit(void)
 
   configblockInit();
   workerInit();
-  adcInit();
+  /* adcInit(); */
   ledseqInit();
-  pmInit();
-    
+  /* pmInit(); */
+
   isInit = true;
 }
 
 bool systemTest()
 {
   bool pass=isInit;
-  
-  pass &= adcTest();
+
+  /* pass &= adcTest(); */
   pass &= ledseqTest();
-  pass &= pmTest();
+  /* pass &= pmTest(); */
   pass &= workerTest();
-  
+
   return pass;
 }
 
@@ -107,7 +107,7 @@ extern int paramsLen;
 void systemTask(void *arg)
 {
   bool pass = true;
-  
+
   //Init the high-levels modules
   systemInit();
 
@@ -128,16 +128,17 @@ void systemTask(void *arg)
   DEBUG_PRINT("I am 0x%X%X%X and I have %dKB of flash!\n",
               *((int*)(0x1FFFF7E8+8)), *((int*)(0x1FFFF7E8+4)),
               *((int*)(0x1FFFF7E8+0)), *((short*)(0x1FFFF7E0)));
+  ledSet(LED_RED, 1);
 
   commanderInit();
   stabilizerInit();
-  
+
   //Test the modules
   pass &= systemTest();
   pass &= commTest();
   pass &= commanderTest();
   pass &= stabilizerTest();
-  
+
   //Start the firmware
   if(pass)
   {
@@ -161,9 +162,9 @@ void systemTask(void *arg)
       ledSet(LED_RED, true);
     }
   }
-  
+
   workerLoop();
-  
+
   //Should never reach this point!
   while(1)
     vTaskDelay(portMAX_DELAY);

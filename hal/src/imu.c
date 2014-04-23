@@ -1,6 +1,6 @@
 /**
- *    ||          ____  _ __                           
- * +------+      / __ )(_) /_______________ _____  ___ 
+ *    ||          ____  _ __
+ * +------+      / __ )(_) /_______________ _____  ___
  * | 0xBC |     / __  / / __/ ___/ ___/ __ `/_  / / _ \
  * +------+    / /_/ / / /_/ /__/ /  / /_/ / / /_/  __/
  *  ||  ||    /_____/_/\__/\___/_/   \__,_/ /___/\___/
@@ -45,9 +45,10 @@
 #include "param.h"
 #include "log.h"
 
-#define IMU_ENABLE_MAG_HMC5883
+/*#define IMU_ENABLE_MAG_HMC5883
 #define IMU_ENABLE_PRESSURE_MS5611
-//#define IMU_MPU6050_DLPF_256HZ
+#define IMU_MPU6050_DLPF_256HZ
+*/
 
 #define IMU_GYRO_FS_CFG       MPU6050_GYRO_FS_2000
 #define IMU_DEG_PER_LSB_CFG   MPU6050_DEG_PER_LSB_2000
@@ -147,6 +148,30 @@ void imu6Init(void)
     DEBUG_PRINT("MPU6050 I2C connection [FAIL].\n");
   }
 
+  vTaskDelay(M2T(MPU6050_SELF_TEST_DELAY_MS));
+
+  mpu6050SetClockSource(MPU6050_CLOCK_PLL_XGYRO);
+  vTaskDelay(M2T(MPU6050_SELF_TEST_DELAY_MS));
+
+  mpu6050SetFullScaleGyroRange(IMU_GYRO_FS_CFG);
+  vTaskDelay(M2T(MPU6050_SELF_TEST_DELAY_MS));
+
+  mpu6050SetFullScaleAccelRange(IMU_ACCEL_FS_CFG);
+  vTaskDelay(M2T(MPU6050_SELF_TEST_DELAY_MS));
+
+  mpu6050SetDLPFMode(MPU6050_DLPF_BW_42);
+  vTaskDelay(M2T(MPU6050_SELF_TEST_DELAY_MS));
+
+  mpu6050SetSleepEnabled(FALSE);
+  vTaskDelay(M2T(MPU6050_SELF_TEST_DELAY_MS));
+
+  mpu6050SetI2CMasterModeEnabled(FALSE);
+  vTaskDelay(M2T(MPU6050_SELF_TEST_DELAY_MS));
+
+  mpu6050SetI2CBypassEnabled(TRUE);
+  vTaskDelay(M2T(MPU6050_SELF_TEST_DELAY_MS));
+
+#if 0
   mpu6050Reset();
   vTaskDelay(M2T(50));
   // Activate MPU6050
@@ -177,6 +202,7 @@ void imu6Init(void)
   mpu6050SetRate(1);
   // Set digital low-pass bandwidth
   mpu6050SetDLPFMode(MPU6050_DLPF_BW_188);
+#endif
 #endif
 
 
@@ -239,16 +265,21 @@ bool imu6Test(void)
     isMpu6050TestPassed = mpu6050SelfTest();
     testStatus = isMpu6050TestPassed ;
   }
+
+#if IMU_ENABLE_MAG_HMC5883
   if (testStatus && isHmc5883lPresent)
   {
     isHmc5883lTestPassed = hmc5883lSelfTest();
     testStatus = isHmc5883lTestPassed;
   }
+#endif
+#if IMU_ENABLE_PRESSURE_MS5611
   if (testStatus && isMs5611Present)
   {
     isMs5611TestPassed = ms5611SelfTest();
     testStatus = isMs5611TestPassed;
   }
+#endif
 
   return testStatus;
 }
@@ -311,10 +342,16 @@ void imu9Read(Axis3f* gyroOut, Axis3f* accOut, Axis3f* magOut)
 
   if (isHmc5883lPresent)
   {
+#ifdef IMU_ENABLE_MAG_HMC5883
     hmc5883lGetHeading(&mag.x, &mag.y, &mag.z);
     magOut->x = (float)mag.x / MAG_GAUSS_PER_LSB;
     magOut->y = (float)mag.y / MAG_GAUSS_PER_LSB;
     magOut->z = (float)mag.z / MAG_GAUSS_PER_LSB;
+#else
+    magOut->x = 0.0;
+    magOut->y = 0.0;
+    magOut->z = 0.0;
+#endif
   }
   else
   {

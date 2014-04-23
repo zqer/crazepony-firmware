@@ -1,6 +1,6 @@
 /**
- *    ||          ____  _ __                           
- * +------+      / __ )(_) /_______________ _____  ___ 
+ *    ||          ____  _ __
+ * +------+      / __ )(_) /_______________ _____  ___
  * | 0xBC |     / __  / / __/ ___/ ___/ __ `/_  / / _ \
  * +------+    / /_/ / / /_/ /__/ /  / /_/ / / /_/  __/
  *  ||  ||    /_____/_/\__/\___/_/   \__,_/ /___/\___/
@@ -38,11 +38,14 @@
 #include "semphr.h"
 #include "queue.h"
 
+#include "crc.h"
 #include "uart.h"
 #include "crtp.h"
 #include "cfassert.h"
 #include "nvicconf.h"
 #include "config.h"
+
+#include "led.h"
 
 #define UART_DATA_TIMEOUT_MS 1000
 #define UART_DATA_TIMEOUT_TICKS (UART_DATA_TIMEOUT_MS / portTICK_RATE_MS)
@@ -103,17 +106,17 @@ void uartInit(void)
 
   /* Enable GPIO and USART clock */
   RCC_APB2PeriphClockCmd(UART_GPIO_PERIF, ENABLE);
-  RCC_APB1PeriphClockCmd(UART_PERIF, ENABLE);
+  RCC_APB2PeriphClockCmd(UART_PERIF, ENABLE);
 
   /* Configure USART Rx as input floating */
   GPIO_InitStructure.GPIO_Pin   = UART_GPIO_RX;
   GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IN_FLOATING;
-  GPIO_Init(GPIOB, &GPIO_InitStructure);
+  GPIO_Init(UART_GPIO_PORT, &GPIO_InitStructure);
 /* Configure USART Tx as alternate function push-pull */
   GPIO_InitStructure.GPIO_Pin   = UART_GPIO_TX;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF_PP;
-  GPIO_Init(GPIOB, &GPIO_InitStructure);
+  GPIO_Init(UART_GPIO_PORT, &GPIO_InitStructure);
 
 #if defined(UART_OUTPUT_TRACE_DATA) || defined(ADC_OUTPUT_RAW_DATA) || defined(IMU_OUTPUT_RAW_DATA_ON_UART)
   USART_InitStructure.USART_BaudRate            = 2000000;
@@ -132,7 +135,7 @@ void uartInit(void)
   uartDmaInit();
 #else
   // Configure Tx buffer empty interrupt
-  NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
@@ -141,7 +144,6 @@ void uartInit(void)
   USART_ITConfig(UART_TYPE, USART_IT_RXNE, ENABLE);
 
   vSemaphoreCreateBinary(waitUntilSendDone);
-
   xTaskCreate(uartRxTask, (const signed char * const)"UART-Rx",
               configMINIMAL_STACK_SIZE, NULL, /*priority*/2, NULL);
 
@@ -150,7 +152,7 @@ void uartInit(void)
 #endif
   //Enable it
   USART_Cmd(UART_TYPE, ENABLE);
-  
+
   isInit = true;
 }
 
@@ -170,6 +172,7 @@ void uartRxTask(void *param)
   CRTPPacket p;
   rxState = waitForFirstStart;
   uint8_t counter = 0;
+
   while(1)
   {
     if (xQueueReceive(uartDataDelivery, &c, UART_DATA_TIMEOUT_TICKS) == pdTRUE)
@@ -289,7 +292,7 @@ static int uartSendCRTPPacket(CRTPPacket *p)
   USART_SendData(UART_TYPE, outBuffer[0] & 0xFF);
   USART_ITConfig(UART_TYPE, USART_IT_TXE, ENABLE);
   xSemaphoreTake(waitUntilSendDone, portMAX_DELAY);
-  
+
   return 0;
 }
 
@@ -322,7 +325,6 @@ void uartDmaIsr(void)
 void uartSendData(uint32_t size, uint8_t* data)
 {
   uint32_t i;
-
   for(i = 0; i < size; i++)
   {
     while (!(UART_TYPE->SR & USART_FLAG_TXE));
@@ -333,7 +335,7 @@ void uartSendData(uint32_t size, uint8_t* data)
 int uartPutchar(int ch)
 {
     uartSendData(1, (uint8_t *)&ch);
-    
+
     return (unsigned char)ch;
 }
 

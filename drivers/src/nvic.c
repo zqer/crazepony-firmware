@@ -1,6 +1,6 @@
 /**
- *    ||          ____  _ __                           
- * +------+      / __ )(_) /_______________ _____  ___ 
+ *    ||          ____  _ __
+ * +------+      / __ )(_) /_______________ _____  ___
  * | 0xBC |     / __  / / __/ ___/ ___/ __ `/_  / / _ \
  * +------+    / /_/ / / /_/ /__/ /  / /_/ / / /_/  __/
  *  ||  ||    /_____/_/\__/\___/_/   \__,_/ /___/\___/
@@ -167,7 +167,7 @@ void DONT_DISCARD DebugMon_Handler(void)
 
 void DONT_DISCARD DMA1_Channel1_IRQHandler(void)
 {
-  adcInterruptHandler();
+  //adcInterruptHandler();
 }
 
 void DONT_DISCARD DMA1_Channel2_IRQHandler(void)
@@ -179,22 +179,22 @@ void DONT_DISCARD DMA1_Channel2_IRQHandler(void)
 
 void DONT_DISCARD DMA1_Channel4_IRQHandler(void)
 {
-  i2cDmaInterruptHandlerI2c2();
+  //i2cDmaInterruptHandlerI2c2();
 }
 
 void DONT_DISCARD DMA1_Channel5_IRQHandler(void)
 {
-  i2cDmaInterruptHandlerI2c2();
+  //i2cDmaInterruptHandlerI2c2();
 }
 
 void DONT_DISCARD DMA1_Channel6_IRQHandler(void)
 {
-  i2cDmaInterruptHandlerI2c1();
+  //i2cDmaInterruptHandlerI2c1();
 }
 
 void DONT_DISCARD DMA1_Channel7_IRQHandler(void)
 {
-  i2cDmaInterruptHandlerI2c1();
+  //i2cDmaInterruptHandlerI2c1();
 }
 
 
@@ -203,7 +203,7 @@ void DONT_DISCARD EXTI9_5_IRQHandler(void)
   extiInterruptHandler();
 }
 
-void DONT_DISCARD USART3_IRQHandler(void)
+void DONT_DISCARD USART1_IRQHandler(void)
 {
   uartIsr();
 }
@@ -219,12 +219,12 @@ void DONT_DISCARD TIM1_UP_IRQHandler(void)
 
 void DONT_DISCARD I2C1_EV_IRQHandler(void)
 {
-  i2cInterruptHandlerI2c1();
+  //i2cInterruptHandlerI2c1();
 }
 
 void DONT_DISCARD I2C1_ER_IRQHandler(void)
 {
-  i2cErrorInterruptHandlerI2c1();
+  //i2cErrorInterruptHandlerI2c1();
 }
 
 void DONT_DISCARD I2C2_EV_IRQHandler(void)
@@ -234,6 +234,6 @@ void DONT_DISCARD I2C2_EV_IRQHandler(void)
 
 void DONT_DISCARD I2C2_ER_IRQHandler(void)
 {
-  I2C_ClearFlag(I2C2, 0x1000FFFF);
+  //I2C_ClearFlag(I2C2, 0x1000FFFF);
 }
 

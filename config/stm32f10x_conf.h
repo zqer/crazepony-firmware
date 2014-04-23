@@ -71,6 +71,10 @@
   #define assert_param(expr) ((void)0)
 #endif /* USE_FULL_ASSERT */
 
+#define TRUE    true
+#define FALSE   false
+
+
 #endif /* __STM32F10x_CONF_H */
 
 /******************* (C) COPYRIGHT 2009 STMicroelectronics *****END OF FILE****/
