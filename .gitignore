@@ -23,3 +23,8 @@ crazypony.uvproj.tmp
 *.bak
 
 config.mk
+
+bin/*
+cscope.*
+tags
+
