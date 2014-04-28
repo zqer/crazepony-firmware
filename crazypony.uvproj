@@ -272,7 +272,7 @@
             <wLevel>2</wLevel>
             <uThumb>1</uThumb>
             <VariousControls>
-              <MiscControls>-fno-strict-aliasing -Wextra -Wimplicit-function-declaration -Wredundant-decls -Wmissing-prototypes -Wundef -Wshadow -fno-common -ffunction-sections -fdata-sections -g3 -include stm32f10x_conf.h</MiscControls>
+              <MiscControls>-fno-strict-aliasing -fno-common -ffunction-sections -fdata-sections -g3 -include stm32f10x_conf.h</MiscControls>
               <Define>BOARD_REV_E STM32F10X_MD DEBUG_PRINT_ON_UART ENABLE_UART</Define>
               <Undefine></Undefine>
               <IncludePath>.\lib\FreeRTOS\include;.\lib\FreeRTOS\portable\GCC\ARM_CM3;.\lib\STM32F10x_StdPeriph_Driver\inc;.\lib\CMSIS\Core\CM3;.\config;.\hal\interface;.\modules\interface;.\utils\interface;.\drivers\interface</IncludePath>
@@ -309,24 +309,9 @@
           <GroupName>drivers</GroupName>
           <Files>
             <File>
-              <FileName>adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\drivers\src\adc.c</FilePath>
-            </File>
-            <File>
               <FileName>exti.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\drivers\src\exti.c</FilePath>
-            </File>
-            <File>
-              <FileName>hmc5883l.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\drivers\src\hmc5883l.c</FilePath>
-            </File>
-            <File>
-              <FileName>i2cdev.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\drivers\src\i2cdev.c</FilePath>
             </File>
             <File>
               <FileName>i2croutines.c</FileName>
@@ -349,11 +334,6 @@
               <FilePath>.\drivers\src\mpu6050.c</FilePath>
             </File>
             <File>
-              <FileName>ms5611.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\drivers\src\ms5611.c</FilePath>
-            </File>
-            <File>
               <FileName>nrf24l01.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\drivers\src\nrf24l01.c</FilePath>
@@ -362,6 +342,11 @@
               <FileName>nvic.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\drivers\src\nvic.c</FilePath>
+            </File>
+            <File>
+              <FileName>i2c_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\drivers\src\i2c_gpio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -387,11 +372,6 @@
               <FileName>ledseq.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\hal\src\ledseq.c</FilePath>
-            </File>
-            <File>
-              <FileName>pm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\hal\src\pm.c</FilePath>
             </File>
             <File>
               <FileName>radiolink.c</FileName>

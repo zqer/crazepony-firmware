@@ -128,7 +128,6 @@ void systemTask(void *arg)
   DEBUG_PRINT("I am 0x%X%X%X and I have %dKB of flash!\n",
               *((int*)(0x1FFFF7E8+8)), *((int*)(0x1FFFF7E8+4)),
               *((int*)(0x1FFFF7E8+0)), *((short*)(0x1FFFF7E0)));
-  ledSet(LED_RED, 1);
 
   commanderInit();
   stabilizerInit();

@@ -29,6 +29,7 @@
 
 #include "math.h"
 
+#include "debug.h"
 #include "system.h"
 #include "pm.h"
 #include "stabilizer.h"
@@ -184,6 +185,8 @@ static void stabilizerTask(void* param)
   systemWaitStart();
 
   lastWakeTime = xTaskGetTickCount ();
+
+  DEBUG_PRINT("stabilizerTask hear\n");
 
   while(1)
   {

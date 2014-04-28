@@ -139,7 +139,7 @@ void imu6Init(void)
 
   i2cdevInit(I2C1);
   mpu6050Init(I2C1);
-  if (mpu6050TestConnection() == TRUE)
+  if (mpu6050TestConnection())
   {
     DEBUG_PRINT("MPU6050 I2C connection [OK].\n");
   }
@@ -148,7 +148,11 @@ void imu6Init(void)
     DEBUG_PRINT("MPU6050 I2C connection [FAIL].\n");
   }
 
+  /* DEBUG_PRINT("mpu6050 device id=0x%08x\n", mpu6050GetDeviceID()); */
+
   vTaskDelay(M2T(MPU6050_SELF_TEST_DELAY_MS));
+  mpu6050Reset();
+  vTaskDelay(M2T(50));
 
   mpu6050SetClockSource(MPU6050_CLOCK_PLL_XGYRO);
   vTaskDelay(M2T(MPU6050_SELF_TEST_DELAY_MS));
@@ -159,7 +163,10 @@ void imu6Init(void)
   mpu6050SetFullScaleAccelRange(IMU_ACCEL_FS_CFG);
   vTaskDelay(M2T(MPU6050_SELF_TEST_DELAY_MS));
 
-  mpu6050SetDLPFMode(MPU6050_DLPF_BW_42);
+  mpu6050SetRate(1);
+  vTaskDelay(M2T(MPU6050_SELF_TEST_DELAY_MS));
+
+  mpu6050SetDLPFMode(MPU6050_DLPF_BW_188);
   vTaskDelay(M2T(MPU6050_SELF_TEST_DELAY_MS));
 
   mpu6050SetSleepEnabled(FALSE);
@@ -300,8 +307,8 @@ void imu6Read(Axis3f* gyroOut, Axis3f* accOut)
     if (gyroBias.isBiasValueFound)
     {
       ledseqRun(LED_RED, seq_calibrated);
-//      uartPrintf("Gyro bias: %i, %i, %i\n",
-//                  gyroBias.bias.x, gyroBias.bias.y, gyroBias.bias.z);
+      uartPrintf("Gyro bias: %i, %i, %i\n",
+                  gyroBias.bias.x, gyroBias.bias.y, gyroBias.bias.z);
     }
   }
 
@@ -316,8 +323,8 @@ void imu6Read(Axis3f* gyroOut, Axis3f* accOut)
     accelBias.bias.y = mean.y;
     accelBias.bias.z = mean.z - IMU_1G_RAW;
     accelBias.isBiasValueFound = TRUE;
-    //uartPrintf("Accel bias: %i, %i, %i\n",
-    //            accelBias.bias.x, accelBias.bias.y, accelBias.bias.z);
+    uartPrintf("Accel bias: %i, %i, %i\n",
+                accelBias.bias.x, accelBias.bias.y, accelBias.bias.z);
   }
 #endif
 
@@ -476,13 +483,13 @@ static bool imuFindBiasValue(BiasObj* bias)
 
     //uartSendData(sizeof(variance), (uint8_t*)&variance);
     //uartSendData(sizeof(mean), (uint8_t*)&mean);
-    //uartPrintf("%i, %i, %i", variance.x, variance.y, variance.z);
-    //uartPrintf("    %i, %i, %i\n", mean.x, mean.y, mean.z);
+    //uartPrintf("%08d, %08d, %08d", variance.x, variance.y, variance.z);
+    //uartPrintf("    %08d, %08d, %08d\r\n", mean.x, mean.y, mean.z);
 
     if (variance.x < GYRO_VARIANCE_THRESHOLD_X &&
         variance.y < GYRO_VARIANCE_THRESHOLD_Y &&
         variance.z < GYRO_VARIANCE_THRESHOLD_Z &&
-        (varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS < xTaskGetTickCount()))
+        ( (varianceSampleTime + GYRO_MIN_BIAS_TIMEOUT_MS) < xTaskGetTickCount()))
     {
       varianceSampleTime = xTaskGetTickCount();
       bias->bias.x = mean.x;
