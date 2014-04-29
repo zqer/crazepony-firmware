@@ -1,6 +1,6 @@
 /*
- *    ||          ____  _ __                           
- * +------+      / __ )(_) /_______________ _____  ___ 
+ *    ||          ____  _ __
+ * +------+      / __ )(_) /_______________ _____  ___
  * | 0xBC |     / __  / / __/ ___/ ___/ __ `/_  / / _ \
  * +------+    / /_/ / / /_/ /__/ /  / /_/ / / /_/  __/
  *  ||  ||    /_____/_/\__/\___/_/   \__,_/ /___/\___/
@@ -37,6 +37,8 @@
 #include "queue.h"
 #include "semphr.h"
 
+#include "debug.h"
+
 static bool isInit;
 
 #define RADIO_CONNECTED_TIMEOUT   M2T(2000)
@@ -70,8 +72,10 @@ static void interruptCallback()
   //To unlock RadioTask
   xSemaphoreGiveFromISR(dataRdy, &xHigherPriorityTaskWoken);
 
-  if(xHigherPriorityTaskWoken)
-    vPortYieldFromISR();
+  if(xHigherPriorityTaskWoken) {
+    taskYIELD();
+    //vPortYieldFromISR();
+  }
 }
 
 // 'Class' functions, called from callbacks
@@ -143,9 +147,9 @@ static void radiolinkTask(void * arg)
 
     xSemaphoreTake(dataRdy, portMAX_DELAY);
     lastPacketTick = xTaskGetTickCount();
-    
+
     nrfSetEnable(false);
-    
+
     //Fetch all the data (Loop until the RX Fifo is NOT empty)
     while( !(nrfRead1Reg(REG_FIFO_STATUS)&0x01) )
     {
@@ -176,7 +180,7 @@ static void radiolinkTask(void * arg)
 
     //clear the interruptions flags
     nrfWrite1Reg(REG_STATUS, 0x70);
-    
+
     //Re-enable the radio
     nrfSetEnable(true);
   }
@@ -185,17 +189,27 @@ static void radiolinkTask(void * arg)
 static void radiolinkInitNRF24L01P(void)
 {
   int i;
-  char radioAddress[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
+  /* char radioAddress[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7}; */
+  char radioAddress[5] = {0x34,0xc3,0x10,0x10,0x11};
 
-  //Set the radio channel
-  nrfSetChannel(configblockGetRadioChannel());
-  //Set the radio data rate
-  nrfSetDatarate(configblockGetRadioSpeed());
+  nrfFlushRx();
+
   //Set radio address
   nrfSetAddress(0, radioAddress);
 
+  nrfWrite1Reg(REG_EN_AA, 0x01);
+  nrfWrite1Reg(REG_EN_RXADDR, 0x1);
+
+  //Set the radio channel
+  nrfSetChannel(configblockGetRadioChannel());
+
+  nrfWrite1Reg(REG_RX_PW_P0, 32);
+
+  //Set the radio data rate
+  nrfSetDatarate(configblockGetRadioSpeed());
+
   //Power the radio, Enable the DS interruption, set the radio in PRX mode
-  nrfWrite1Reg(REG_CONFIG, 0x3F);
+  nrfWrite1Reg(REG_CONFIG, 0x0F);
   vTaskDelay(M2T(2)); //Wait for the chip to be ready
   // Enable the dynamic payload size and the ack payload for the pipe 0
   nrfWrite1Reg(REG_FEATURE, 0x06);

@@ -48,7 +48,7 @@ void commInit(void)
   eskylinkInit();
 #else
   /* TODO for NRF init */
-  /* radiolinkInit(); */
+  radiolinkInit();
 #endif
 
   crtpInit();

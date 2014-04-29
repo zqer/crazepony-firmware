@@ -61,10 +61,10 @@ int main()
   ledInit();
   motorsInit();
 
-  TIM2->CCR1 = 0;
+  /* TIM2->CCR1 = 0;
   TIM2->CCR2 = 0;
   TIM2->CCR3 = 0;
-  TIM2->CCR4 = 0;
+  TIM2->CCR4 = 0; */
 
   //Launch the system task that will initialize and start everything
   systemLaunch();

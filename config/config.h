@@ -1,6 +1,6 @@
 /**
- *    ||          ____  _ __                           
- * +------+      / __ )(_) /_______________ _____  ___ 
+ *    ||          ____  _ __
+ * +------+      / __ )(_) /_______________ _____  ___
  * | 0xBC |     / __  / / __/ ___/ ___/ __ `/_  / / _ \
  * +------+    / /_/ / / /_/ /__/ /  / /_/ / / /_/  __/
  *  ||  ||    /_____/_/\__/\___/_/   \__,_/ /___/\___/
@@ -57,8 +57,8 @@
 #define T_LAUNCH_MULTICONTROL
 
 //The radio channel. From 0 to 125
-#define RADIO_CHANEL 10
-#define RADIO_DATARATE RADIO_RATE_250K
+#define RADIO_CHANEL 40
+#define RADIO_DATARATE RADIO_RATE_2M
 
 #define ACTIVATE_AUTO_SHUTDOWN
 
