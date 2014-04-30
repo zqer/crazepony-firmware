@@ -184,9 +184,9 @@ static void stabilizerTask(void* param)
   //Wait for the system to be fully started to start stabilization loop
   systemWaitStart();
 
-  lastWakeTime = xTaskGetTickCount ();
+  lastWakeTime = xTaskGetTickCount();
 
-  DEBUG_PRINT("stabilizerTask hear\n");
+  DEBUG_PRINT("stabilizerTask hear\r\n");
 
   while(1)
   {

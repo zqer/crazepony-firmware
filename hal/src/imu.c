@@ -67,10 +67,15 @@
 
 #define IMU_NBR_OF_BIAS_SAMPLES  128
 
+#if 0
 #define GYRO_VARIANCE_BASE        4000
 #define GYRO_VARIANCE_THRESHOLD_X (GYRO_VARIANCE_BASE)
 #define GYRO_VARIANCE_THRESHOLD_Y (GYRO_VARIANCE_BASE)
 #define GYRO_VARIANCE_THRESHOLD_Z (GYRO_VARIANCE_BASE)
+#endif
+#define GYRO_VARIANCE_THRESHOLD_X (80000)
+#define GYRO_VARIANCE_THRESHOLD_Y (50000)
+#define GYRO_VARIANCE_THRESHOLD_Z (50000)
 
 #define MAG_GAUSS_PER_LSB_CFG    HMC5883L_GAIN_660
 #define MAG_GAUSS_PER_LSB        660.0
@@ -307,7 +312,7 @@ void imu6Read(Axis3f* gyroOut, Axis3f* accOut)
     if (gyroBias.isBiasValueFound)
     {
       ledseqRun(LED_RED, seq_calibrated);
-      uartPrintf("Gyro bias: %i, %i, %i\n",
+      uartPrintf("Gyro bias: %i, %i, %i\r\n",
                   gyroBias.bias.x, gyroBias.bias.y, gyroBias.bias.z);
     }
   }

@@ -1,6 +1,6 @@
 /**
- *    ||          ____  _ __                           
- * +------+      / __ )(_) /_______________ _____  ___ 
+ *    ||          ____  _ __
+ * +------+      / __ )(_) /_______________ _____  ___
  * | 0xBC |     / __  / / __/ ___/ ___/ __ `/_  / / _ \
  * +------+    / /_/ / / /_/ /__/ /  / /_/ / / /_/  __/
  *  ||  ||    /_____/_/\__/\___/_/   \__,_/ /___/\___/
@@ -56,11 +56,18 @@
 
 #define VAL_RF_SETUP_250K 0x26
 #define VAL_RF_SETUP_1M   0x06
-#define VAL_RF_SETUP_2M   0x0E
+/* #define VAL_RF_SETUP_2M   0x0E */
+#define VAL_RF_SETUP_2M     0x0F
 
 #define VAL_SETUP_AW_3B 1
 #define VAL_SETUP_AW_4B 2
 #define VAL_SETUP_AW_5B 3
+
+#define RD_RX_PLOAD 0x61
+#define RX_PLOAD_WIDTH  32
+#define RX_DR       6
+#define TX_DS       5
+#define MAX_RT      4
 
 
 #endif /* __NRF24L01REG_H__ */

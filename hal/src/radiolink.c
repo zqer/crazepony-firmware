@@ -65,6 +65,18 @@ static struct {
   bool enabled;
 } state;
 
+typedef struct
+{
+  float ROOL;
+  float PITCH;
+  int THROTTLE;
+  int YAW;
+} RC_GETDATA;
+
+char NRF24L01_RXDATA[RX_PLOAD_WIDTH];
+char NRF24L01_TXDATA[RX_PLOAD_WIDTH];
+RC_GETDATA RC_DATA;
+
 static void interruptCallback()
 {
   portBASE_TYPE  xHigherPriorityTaskWoken = pdFALSE;
@@ -137,14 +149,64 @@ static struct crtpLinkOperations radioOp =
  */
 static void radiolinkTask(void * arg)
 {
+#define Angle_Max 3.0
+
   unsigned char dataLen;
   static RadioPacket pk;
+  uint8_t sta;
 
-  //Packets handling loop
+  DEBUG_PRINT("radiolinkTask before wait start\r\n");
+
+  systemWaitStart();
+
+  lastPacketTick = xTaskGetTickCount();
+
+  DEBUG_PRINT("radiolinkTask hear\r\n");
+
   while(1)
   {
     ledseqRun(LED_GREEN, seq_linkup);
 
+    vTaskDelayUntil(&lastPacketTick, F2T(250));
+    /* nrfSetEnable(false); */
+
+    //TODO hear
+    sta = nrfRead1Reg(REG_STATUS);
+    if(sta & (1<<RX_DR)) {
+        nrfReadReg(RD_RX_PLOAD, NRF24L01_RXDATA, RX_PLOAD_WIDTH);
+
+        //ROOL
+        RC_DATA.ROOL = NRF24L01_RXDATA[3] - 50 + 0 - 100;
+        RC_DATA.ROOL = RC_DATA.ROOL / 10.0;
+        RC_DATA.ROOL = (RC_DATA.ROOL > Angle_Max)  ? (Angle_Max) : (RC_DATA.ROOL);
+        RC_DATA.ROOL = (RC_DATA.ROOL < -Angle_Max) ? (-Angle_Max) : (RC_DATA.ROOL);
+
+        //PITCH
+        RC_DATA.PITCH = NRF24L01_RXDATA[2] - 50 + 0 - 100;
+        RC_DATA.PITCH = RC_DATA.PITCH / 10.0;
+        RC_DATA.PITCH = (RC_DATA.PITCH > Angle_Max)  ? (Angle_Max) : (RC_DATA.PITCH);
+        RC_DATA.PITCH = (RC_DATA.PITCH < -Angle_Max) ? (-Angle_Max) : (RC_DATA.PITCH);
+
+        //YAW
+        //RC_DATA.YAW = 50-NRF24L01_RXDATA[4];
+        RC_DATA.YAW = 0;
+        RC_DATA.YAW = RC_DATA.YAW / 10.0;
+        RC_DATA.YAW = (RC_DATA.YAW > Angle_Max)  ? (Angle_Max):(RC_DATA.YAW);
+        RC_DATA.YAW = (RC_DATA.YAW < -Angle_Max) ? (-Angle_Max):(RC_DATA.YAW);
+
+        RC_DATA.THROTTLE = NRF24L01_RXDATA[0] + (NRF24L01_RXDATA[1]<<8);
+
+        /* FLY_ENABLE = NRF24L01_RXDATA[31]; */
+        DEBUG_PRINT("%f %f %d %d\r\n", RC_DATA.ROOL, RC_DATA.PITCH, RC_DATA.YAW, RC_DATA.THROTTLE);
+    }
+
+    //clear the interruptions flags
+    nrfWrite1Reg(0x27, sta);
+
+    //Re-enable the radio
+    /* nrfSetEnable(true); */
+
+#if 0
     xSemaphoreTake(dataRdy, portMAX_DELAY);
     lastPacketTick = xTaskGetTickCount();
 
@@ -183,6 +245,7 @@ static void radiolinkTask(void * arg)
 
     //Re-enable the radio
     nrfSetEnable(true);
+#endif
   }
 }
 
@@ -212,15 +275,15 @@ static void radiolinkInitNRF24L01P(void)
   nrfWrite1Reg(REG_CONFIG, 0x0F);
   vTaskDelay(M2T(2)); //Wait for the chip to be ready
   // Enable the dynamic payload size and the ack payload for the pipe 0
-  nrfWrite1Reg(REG_FEATURE, 0x06);
-  nrfWrite1Reg(REG_DYNPD, 0x01);
+  /* nrfWrite1Reg(REG_FEATURE, 0x06);
+  nrfWrite1Reg(REG_DYNPD, 0x01); */
 
   //Flush RX
   for(i=0;i<3;i++)
     nrfFlushRx();
   //Flush TX
-  for(i=0;i<3;i++)
-    nrfFlushTx();
+  /* for(i=0;i<3;i++)
+    nrfFlushTx(); */
 }
 
 /*
@@ -246,10 +309,13 @@ void radiolinkInit()
   txQueue = xQueueCreate(3, sizeof(RadioPacket));
 
   radiolinkInitNRF24L01P();
+  nrfSetEnable(true);
 
-    /* Launch the Radio link task */
+  /* Launch the Radio link task */
   xTaskCreate(radiolinkTask, (const signed char * const)"RadioLink",
-              configMINIMAL_STACK_SIZE, NULL, /*priority*/1, NULL);
+              configMINIMAL_STACK_SIZE, NULL, /*priority*/2, NULL);
+
+  DEBUG_PRINT("radiolinkInit hear\r\n");
 
   isInit = true;
 }

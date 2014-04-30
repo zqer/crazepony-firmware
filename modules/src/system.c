@@ -141,12 +141,14 @@ void systemTask(void *arg)
   //Start the firmware
   if(pass)
   {
+    DEBUG_PRINT("Test all passed\r\n");
     systemStart();
     ledseqRun(LED_RED, seq_alive);
     ledseqRun(LED_GREEN, seq_testPassed);
   }
   else
   {
+    DEBUG_PRINT("Test all failed\r\n");
     if (systemTest())
     {
       while(1)

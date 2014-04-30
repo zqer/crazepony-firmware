@@ -418,7 +418,7 @@ void nrfInit(void)
 #endif
 
   // Clock the radio with 16MHz
-  RCC_MCOConfig(RCC_MCO_HSE);
+  /* RCC_MCOConfig(RCC_MCO_HSE); */
 
   /* disable the chip select */
   RADIO_DIS_CS();
