@@ -12,8 +12,6 @@
 #include "i2cdev.h"
 #include "i2c_gpio.h"
 
-#define BOARD_2
-
 #ifdef BOARD_2
 #define SCL_PIN     GPIO_Pin_6
 #define SDA_PIN     GPIO_Pin_7

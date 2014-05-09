@@ -69,7 +69,11 @@
 #define configUSE_PREEMPTION		1
 #define configUSE_IDLE_HOOK			0
 #define configUSE_TICK_HOOK			0
+#ifdef BOARD_2
 #define configCPU_CLOCK_HZ			( ( unsigned long ) 72000000 )
+#else
+#define configCPU_CLOCK_HZ			( ( unsigned long ) 52000000 )
+#endif
 #define configTICK_RATE_HZ			( ( portTickType ) 1000 )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 100 )
 #define configTOTAL_HEAP_SIZE		( ( size_t ) ( 15000 ) )

@@ -56,7 +56,7 @@
 #define RADIO_GPIO_CLK_PERIF      RCC_APB2Periph_GPIOA
 #endif
 
-#define RADIO_GPIO_CE             GPIO_Pin_15
+#define RADIO_GPIO_CE             GPIO_Pin_12
 #define RADIO_GPIO_CE_PORT        GPIOA
 #define RADIO_GPIO_CE_PERIF       RCC_APB2Periph_GPIOA
 

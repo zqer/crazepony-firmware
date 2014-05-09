@@ -78,6 +78,7 @@ int main()
   return 0;
 }
 
+#ifdef BOARD_2
 //Clock configuration
 static void prvClockInit(void)
 {
@@ -133,7 +134,31 @@ static void prvClockInit(void)
     while(1);
   }
 }
+#else
+void prvClockInit(void) {
+    RCC->CR |= (1<<0);
+    while(!( (RCC->CR) & ( 1 << 1) ));
+
+    FLASH->ACR |= FLASH_ACR_PRFTBE;
+    FLASH->ACR &= ((uint32_t)~FLASH_ACR_LATENCY);
+    FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_2;
+
+    RCC->CFGR |= ((0<<16) || (7 << 18));    /* 52M and HSI clock */
+    RCC->CR |= (1<<24);                     /* PLL ON */
+
+    while(!( (RCC->CR) & (1<<25) ));
+
+    RCC->CFGR |= (2<<0);                    /* HSI oscillator used as system clock */
+
+    /* RCC_HCLKConfig(RCC_SYSCLK_Div1);
+    RCC_PCLK2Config(RCC_HCLK_Div1);
+    RCC_PCLK1Config(RCC_HCLK_Div2); */
+    NVIC_SetVectorTable( NVIC_VectTab_FLASH, 0x0 );
+
+    SysTick_CLKSourceConfig( SysTick_CLKSource_HCLK );
+}
+#endif
 
 void SystemInit(){
-
+    /* Not used */
 }

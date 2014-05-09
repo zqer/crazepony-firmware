@@ -130,6 +130,7 @@ void systemTask(void *arg)
               *((int*)(0x1FFFF7E8+0)), *((short*)(0x1FFFF7E0)));
 
   commanderInit();
+
   stabilizerInit();
 
   //Test the modules
@@ -141,6 +142,7 @@ void systemTask(void *arg)
   //Start the firmware
   if(pass)
   {
+    GPIO_SetBits(GPIOB, GPIO_Pin_1);
     DEBUG_PRINT("Test all passed\r\n");
     systemStart();
     ledseqRun(LED_RED, seq_alive);
@@ -148,6 +150,7 @@ void systemTask(void *arg)
   }
   else
   {
+    GPIO_SetBits(GPIOB, GPIO_Pin_1);
     DEBUG_PRINT("Test all failed\r\n");
     if (systemTest())
     {
